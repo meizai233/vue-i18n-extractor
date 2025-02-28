@@ -3,7 +3,9 @@ const { resolve } = require("path");
 
 // 猜测 在这里存储的全局对象应该是作为一个storage存放的
 let globalSetting = {};
-let localeWordConfig = {};
+// 本地的语言包
+let exsitConfig = {};
+let addConfig = {};
 const resourceMap = {};
 /**
  * 当前编译资源映射表
@@ -108,96 +110,38 @@ function init() {
   const entryFile = resolve(entryPath, filename);
   globalSetting.entryFile = entryFile;
 
+  // 拿到本地的语言包
   try {
-    const exsitConfig = require(entryFile);
-    for (const key in exsitConfig) {
-      if (!Object.prototype.hasOwnProperty.call(exsitConfig, key)) {
-        return;
-      }
-      localeWordConfig[key] = exsitConfig[key];
-    }
+    exsitConfig = require(entryFile);
   } catch (e) {
     console.error("There is no locale keyword file " + entryFile);
   }
 }
 init();
 
-const addConfig = (key, value) => {
-  if (localeWordConfig[key]) {
-    return addConfig(++key, value);
-  } else {
-    localeWordConfig[key] = value;
-    return key + "";
-  }
-};
-
 /**
  * Default rule to set the key for new word
  * @returns
  */
 const defaultKeyRule = (value) => {
-  const max = Object.keys(localeWordConfig).sort((a, b) => b - a)[0];
-  let key = "";
-  let isAdded = false;
-  for (let i = 0; i < max; i++) {
-    if (!localeWordConfig[i]) {
-      localeWordConfig[i] = value;
-      isAdded = true;
-      key = i + "";
-      break;
-    }
-  }
-  if (isAdded) {
-    return key;
-  } else {
-    const len = Object.keys(localeWordConfig).length;
-    return addConfig(len, value);
-  }
-};
-
-const setConfig = (value) => {
-  let currentKey = getKey(value);
-  if (currentKey) {
-    return currentKey;
-  } else {
-    if (globalSetting.keyRule) {
-      const newKey = globalSetting.keyRule(value, localeWordConfig);
-      localeWordConfig[newKey] = value;
-      return newKey;
-    } else {
-      return defaultKeyRule(value);
-    }
-  }
+  const key = `i18n_${Buffer.from(value).toString("hex")}`;
+  return key;
 };
 
 const updateConfig = (value) => {
-  localeWordConfig = value;
-};
-
-const getKey = (value) => {
-  let currentKey = null;
-  for (const k in localeWordConfig) {
-    if (!Object.prototype.hasOwnProperty.call(localeWordConfig, k)) {
-      return;
-    }
-    if (localeWordConfig[k] === value) {
-      currentKey = k;
-      break;
-    }
-  }
-  return currentKey;
+  exsitConfig = value;
 };
 
 const setCurrentCompileResourceMap = (path, collection, keyInCodes) => {
   let config = {};
   if (keyInCodes.length) {
     keyInCodes.forEach((key) => {
-      if (!localeWordConfig[key]) {
+      if (!exsitConfig[key]) {
         return;
       }
       if (!config[key]) {
         config[key] = {
-          value: localeWordConfig[key],
+          value: exsitConfig[key],
           count: 1,
         };
       } else {
@@ -343,13 +287,14 @@ const createConfigbyMap = () => {
 
 module.exports = {
   globalSetting,
-  setConfig,
+  addConfig,
+  exsitConfig,
+  defaultKeyRule,
   setCurrentCompileResourceMap,
   updateResourceMap,
   getResource,
   addCompiledFiles,
   setCompiledFiles,
-  getKey,
   setCompileDone,
   getCompileDone,
   createConfigbyMap,

@@ -1,9 +1,13 @@
 {
-  "0": "Running",
-  "1": "Sample data",
-  "3": "Welcome to the automatic internationalization plugin",
-  "4": "This is a test page",
-  "5": "Click to test",
-  "6": "Current status:",
-  "7": "Test data:"
+  "i18n_e6ada3e59ca8e8bf90e8a18ce4b8ad": "Running",
+  "i18n_e7a4bae4be8be695b0e68dae": "Sample data",
+  "i18n_e782b9e587bbe4ba86e4b880e4b8aae68c89e992ae": "Clicked a button",
+  "i18n_e8bf99e698afe4b880e4b8aae6b58be8af95e9a1b5e99da2": "This is a test page",
+  "i18n_e782b9e587bbe6b58be8af95": "Click to test",
+  "i18n_e58887e68da2e8afade8a880": "Switch language",
+  "i18n_e5bd93e5898de78ab6e68081efbc9a": "Current status:",
+  "i18n_e6b58be8af95e695b0e68daeefbc9a": "Test data:",
+  "i18n_e6aca2e8bf8ee4bdbfe794a8e887aae58aa8e59bbde99985e58c96e68f92e4bbb6": "Welcome to the automatic internationalization plugin",
+  "i18n_e5bd93e5898de78ab6e68081efbc9ae6ada3e59ca8e8bf90e8a18ce4b8ad": "Current status: Running",
+  "i18n_e6b58be8af95e695b0e68daeefbc9ae7a4bae4be8be695b0e68dae": "Test data: Sample data"
 }

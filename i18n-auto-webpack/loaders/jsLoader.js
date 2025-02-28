@@ -7,7 +7,7 @@ const generator = require("@babel/generator");
 
 const { transCode, localeWordPattern } = require("./transform.js");
 
-const { setConfig, setCurrentCompileResourceMap, addCompiledFiles, getKey, getCompileDone, globalSetting } = require("../common/collect.js");
+const { defaultKeyRule, globalSetting, addConfig, exsitConfig } = require("../common/collect.js");
 
 function isInConsole(path) {
   const { type: parentType, callee: parentCallee } = path.parent;
@@ -24,13 +24,12 @@ function isInConsole(path) {
  * @param {string} source - 输入文件的源代码内容
  * @returns {string} - 处理后的内容
  */
-function simpleLoader(code) {
+function jsLoader(code) {
   // 标记 loader 为可缓存的，提高构建性能
   this.cacheable && this.cacheable();
   const { resourcePath } = this;
   const keyInCodes = [];
 
-  const collection = []; //收集中文
   // 待办 能不能做增量更新
 
   // 获取当前处理的文件路径
@@ -40,23 +39,8 @@ function simpleLoader(code) {
   if (process.env.NODE_ENV === "development") {
     console.log(`[simple-loader] 处理文件: ${fileName}`);
   }
-  // 拿到src下的所有代码
-  // parse 解析js
-  // ??? 在js上 拿到render函数
-  // 待办 我想知道.vue是如何变成这一串的
-  // vue-loader 先拿到.vue 然后拆分成三个模块，module识别到js模块 放到js传输带
-
   // 获取 loader 选项
-  const {
-    includes = [],
-    excludes = [],
-    name = "this.$t",
-    // alias = [],
-    // watch,
-    dependency, // {name, value, objectPattern}
-    transform = true,
-    // fallback = false,
-  } = this.getOptions() || {};
+  const { includes = [], excludes = [], name = "t", transform = true } = this.getOptions() || {};
 
   // 处理排除文件 如果包含在内直接返回
   if (excludes.length && excludes.some((item) => resourcePath.indexOf(item) === 0)) {
@@ -78,10 +62,6 @@ function simpleLoader(code) {
         return;
       }
 
-      // if (findCommentExclude(path)) {
-      //   return;
-      // }
-
       if (isInConsole(path)) {
         return;
       }
@@ -99,8 +79,10 @@ function simpleLoader(code) {
             const wordKeyMap = {};
             res.forEach((word) => {
               // 设置国际化语言包的key
-              const key = setConfig(word);
-              collection.push({ [key]: word });
+              const key = defaultKeyRule(word);
+              if (!exsitConfig[key] && !addConfig[key]) {
+                addConfig[key] = word;
+              }
               wordKeyMap[word] = key;
             });
             transform && transCode({ path, originValue: val, wordKeyMap, calle: name });
@@ -108,13 +90,12 @@ function simpleLoader(code) {
         }
       }
     },
+
+    // TemplateLiteral 这是个啥
+    // 问题 纯静态变量会被提升
   };
 
   traverse.default(ast, visitor);
-
-  // 是否收集到了语言包
-  const hasLang = collection.length;
-
   const newCode = generator.default(ast, {}, code).code;
 
   // 待办 这里只把code做了替换
@@ -127,12 +108,12 @@ function simpleLoader(code) {
   // 待办 中文包需要通过$t的形式进行变量替换
 
   // 收集 currentCompileResourceMap
-  setCurrentCompileResourceMap(resourcePath, collection, keyInCodes); // create the latest collection to this file in sourcemap variable
-  addCompiledFiles(resourcePath);
+  // setCurrentCompileResourceMap(resourcePath, collection, keyInCodes); // create the latest collection to this file in sourcemap variable
+  // addCompiledFiles(resourcePath);
 
   // 为什么在plugin中放置
 
   return newCode;
 }
 
-module.exports = simpleLoader;
+module.exports = jsLoader;

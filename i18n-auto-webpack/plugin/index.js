@@ -1,4 +1,4 @@
-const { globalSetting, getResource, setCompileDone, setCompiledFiles, updateResourceMap, createConfigbyMap, updateConfig } = require("../common/collect");
+const { globalSetting, getResource, setCompileDone, setCompiledFiles, updateResourceMap, createConfigbyMap, updateConfig, addConfig } = require("../common/collect");
 const { createFile } = require("../common/utils");
 
 let once = false;
@@ -25,9 +25,10 @@ const createConfig = (output) => {
 const createEmit = ({ output, sourceMap, translate }, fileChange) => {
   const { configNeedUpdate, sourceMapNeedUpdate } = fileChange;
 
-  if (configNeedUpdate) {
-    createConfig(output);
-  }
+  // if (configNeedUpdate) {
+  // createConfig(output);
+  // createConfig
+  // }
 };
 class I18nConfigPlugin {
   constructor(options) {
@@ -41,18 +42,19 @@ class I18nConfigPlugin {
       // 拿到国际化map的配置 怎么拿?
 
       const handleData = () => {
-        // ??? 每个函数都看一遍 研究一下每个参数是干嘛的
         const fileChange = updateResourceMap();
         setCompiledFiles([]);
         setCompileDone(true);
-        createEmit(
-          {
-            output,
-            sourceMap,
-            translate,
-          },
-          fileChange
-        );
+        // createEmit(
+        //   {
+        //     output,
+        //     sourceMap,
+        //     translate,
+        //   },
+        //   fileChange
+        // );
+
+        createFile(addConfig);
       };
       // 待办 这里可以优化 具体优化啥还不知道 可能是热更新之类的
       handleData();
@@ -63,15 +65,6 @@ class I18nConfigPlugin {
     // 待办 确认下这个配置是啥意思
     const { output, watch, sourceMap, translate } = this.options || {};
   }
-
-  // hook(target, name, method, cb) {
-  //   // 待办 每个参数啥意思
-  //   if (target.hooks) {
-  //     target.hooks[name][method]("i18nAutoPlugin", cb);
-  //   } else {
-  //     target.plugin(name, cb);
-  //   }
-  // }
 }
 
 module.exports = I18nConfigPlugin;

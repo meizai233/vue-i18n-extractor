@@ -4,16 +4,15 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import TestI18n from "./components/TestI18n.vue";
 
-export default {
-  name: "App",
-  components: {
-    TestI18n,
-  },
-  mounted() {
-    console.log("i18n instance:", this.$i18n);
-  },
-};
+// 获取 i18n 实例
+const { locale, messages } = useI18n();
+
+onMounted(() => {
+  console.log("i18n instance:", { locale: locale.value, messages: messages.value });
+});
 </script>
