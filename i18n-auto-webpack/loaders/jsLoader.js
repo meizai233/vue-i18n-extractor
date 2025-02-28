@@ -30,7 +30,7 @@ function jsLoader(code) {
   const { resourcePath } = this;
   const keyInCodes = [];
 
-  // 待办 能不能做增量更新
+  // 待办 增量更新
 
   // 获取当前处理的文件路径
   const filePath = this.resourcePath;
@@ -97,21 +97,6 @@ function jsLoader(code) {
 
   traverse.default(ast, visitor);
   const newCode = generator.default(ast, {}, code).code;
-
-  // 待办 这里只把code做了替换
-  // 每个js文件都需要单独import i18n? 为啥?
-  // if (transform && hasLang) {
-  //   const { name, objectPattern } = dependency;
-  // }
-
-  // 待办 把语言包存到文件 在哪个阶段做这件事? 在每次loader后 写入 还是?
-  // 待办 中文包需要通过$t的形式进行变量替换
-
-  // 收集 currentCompileResourceMap
-  // setCurrentCompileResourceMap(resourcePath, collection, keyInCodes); // create the latest collection to this file in sourcemap variable
-  // addCompiledFiles(resourcePath);
-
-  // 为什么在plugin中放置
 
   return newCode;
 }

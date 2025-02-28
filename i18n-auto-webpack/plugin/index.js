@@ -37,22 +37,15 @@ class I18nConfigPlugin {
   apply(compiler) {
     const { output, sourceMap, translate } = this.initOption() || {};
 
-    // 在compiler的done hook上注册一个事件，名字为 自动国际化，callback为
+    // 在compiler的done hook上注册一个事件，名字为 自动国际化，callback处理data
     compiler.hooks.done.tap("i18nAutoPlugin", (stats) => {
-      // 拿到国际化map的配置 怎么拿?
+      // 待办 每次编译都进行更新吗 如何全量更新 感觉不需要。。。开发过程中不太需要这个功能
 
       const handleData = () => {
+        // 待办 看下是否有更新
         const fileChange = updateResourceMap();
         setCompiledFiles([]);
         setCompileDone(true);
-        // createEmit(
-        //   {
-        //     output,
-        //     sourceMap,
-        //     translate,
-        //   },
-        //   fileChange
-        // );
 
         createFile(addConfig);
       };
